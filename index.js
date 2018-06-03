@@ -2,7 +2,9 @@
     'use strict';
 const http = require('http');
 const CONFIG = require('./app.config');
-const server = http.createServer().listen(CONFIG.SERVER_CONFIG.PORT);
+const server = http.createServer().listen(CONFIG.SERVER_CONFIG.PORT, function (params) {
+    console.log('server start', CONFIG.SERVER_CONFIG.PORT )
+}); 
 const url = require('url');
 const userController = require('./Controller/user');
 

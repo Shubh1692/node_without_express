@@ -3,7 +3,7 @@
     module.exports = {
         SERVER_CONFIG: {
             PORT: 3000,
-            DATABASE_NAME: 'netflix_db'
+            DATABASE_NAME: 'test_db'
         },
         ERROR_MESSAGE: {
             DATABASE_ERROR: 'Error by data base',
