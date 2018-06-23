@@ -1,12 +1,13 @@
 (function () {
     'use strict';
-    const netflix_db = require('../Config/database');
-    const uuidv4 = require('uuid/v4');
-    const CONFIG = require('../app.config');
+    const netflix_db = require('../Config/database'),
+        uuidv4 = require('uuid/v4'),
+        CONFIG = require('../app.config');
+
     function _creatUser(user, res) {
         user.uuid = uuidv4();
         try {
-            netflix_db.db.push("/users/" + user.uuid, user, true);
+            netflix_db.db.push(`/users/${user.uuid}`, user, true);
             _sendResponse(200, {
                 msg: CONFIG.SUCCESS_MESSAGE.USER_API_SUCCESS.CREATE_USER,
                 user: user
@@ -17,16 +18,17 @@
                 error: error
             }, res);
         };
-
-
     }
 
     function _updateUser(user_id, user, res) {
         try {
-            netflix_db.db.push("/users/" + user_id, user, true);
+            const users_path = `/users${(user_id ? `/${user_id}` : '')}`,
+                previous_user = netflix_db.db.getData(users_path),
+                new_user_info = Object.assign({}, previous_user, user);
+            netflix_db.db.push(`/users/${user_id}`, new_user_info, true);
             _sendResponse(200, {
                 msg: CONFIG.SUCCESS_MESSAGE.USER_API_SUCCESS.UPDATE_USER,
-                user: user
+                user: new_user_info
             }, res);
         } catch (error) {
             _sendResponse(400, {
@@ -38,7 +40,7 @@
 
     function _deleteUser(user_id, user, res) {
         try {
-            netflix_db.db.delete("/users/" + user_id, user, true);
+            netflix_db.db.delete(`/users/${user_id}`, user, true);
             _sendResponse(200, {
                 msg: CONFIG.SUCCESS_MESSAGE.USER_API_SUCCESS.DELETE_USER,
                 user_id: user_id
@@ -51,12 +53,10 @@
         };
     }
 
-
     function _getUsers(user_id, res) {
-        let users = {};
-        let users_path = "/users" + (user_id ? '/' + user_id : '');
         try {
-            users = netflix_db.db.getData(users_path);
+            const users_path = `/users${(user_id ? `/${user_id}` : '')}`;
+            const users = netflix_db.db.getData(users_path);
             _sendResponse(200, {
                 msg: CONFIG.SUCCESS_MESSAGE.USER_API_SUCCESS.GET_USER,
                 users: users
@@ -69,9 +69,8 @@
         };
     }
 
-
     function _sendResponse(status, json, res) {
-        res.writeHead(200, { 'Content-Type': 'application/json' })
+        res.writeHead(status, { 'Content-Type': 'application/json' })
         res.write(JSON.stringify(json));
         res.end();
     }
